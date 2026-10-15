@@ -38,7 +38,7 @@ export function getStoredApiConfig(): LtaApiConfig {
   }
   return {
     useMockFallback: true,
-    backendBaseUrl: '/api/lta',
+    backendBaseUrl: '/api',
   };
 }
 
@@ -52,7 +52,7 @@ export function saveApiConfig(config: LtaApiConfig): void {
 
 /**
  * Fetch real-time bus arrivals for a given 5-digit bus stop code.
- * Follows LTA DataMall v2: /BusArrivalv2?BusStopCode={code}&ServiceNo={serviceNo}
+ * Proxies to serverless /api/busarrival?BusStopCode={code}&ServiceNo={serviceNo}
  */
 export async function getBusArrival(
   busStopCode: string,
@@ -61,10 +61,11 @@ export async function getBusArrival(
 ): Promise<LtaBusArrivalResponse> {
   if (!config.useMockFallback && config.backendBaseUrl) {
     try {
-      const url = new URL(
-        `${config.backendBaseUrl}/bus-arrival`,
-        window.location.origin
-      );
+      const endpoint = config.backendBaseUrl.endsWith('/busarrival')
+        ? config.backendBaseUrl
+        : `${config.backendBaseUrl}/busarrival`;
+
+      const url = new URL(endpoint, window.location.origin);
       url.searchParams.set('BusStopCode', busStopCode);
       if (serviceNo) {
         url.searchParams.set('ServiceNo', serviceNo);

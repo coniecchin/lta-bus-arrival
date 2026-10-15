@@ -48,7 +48,10 @@ export const BackendConfigModal: React.FC<BackendConfigModalProps> = ({
 
     setTestStatus('testing');
     try {
-      const url = `${config.backendBaseUrl}/bus-arrival?BusStopCode=08057`;
+      const endpoint = config.backendBaseUrl.endsWith('/busarrival')
+        ? config.backendBaseUrl
+        : `${config.backendBaseUrl}/busarrival`;
+      const url = `${endpoint}?BusStopCode=83139`;
       const res = await fetch(url);
       if (res.ok) {
         setTestStatus('success');
